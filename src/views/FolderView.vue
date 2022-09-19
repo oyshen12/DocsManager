@@ -4,6 +4,7 @@
     <file-item
       v-for="file in filtredFiles"
       :file="file"
+      :key="file.id"
       class="mt-4"
     ></file-item>
   </div>
