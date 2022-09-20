@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-wrap justify-md-space-between">
+  <div class="grid">
     <file-add></file-add>
     <file-item
       v-for="file in filtredFiles"
@@ -29,4 +29,11 @@ export default {
 </script>
 
 <style scoped>
+.grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 240px);
+  grid-gap: 1rem;
+  justify-content: space-between;
+}
 </style>

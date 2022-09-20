@@ -4,7 +4,6 @@
       <v-card
         :class="{ 'card-hover': hover }"
         class="d-flex flex-column py-6"
-        min-width="240"
         min-height="268"
       >
         <input

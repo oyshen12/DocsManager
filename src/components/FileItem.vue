@@ -1,10 +1,6 @@
 <template>
   <v-hover v-slot="{ hover }">
-    <v-card
-      :class="{ 'card-hover': hover }"
-      class="d-flex flex-column py-6"
-      width="240"
-    >
+    <v-card :class="{ 'card-hover': hover }" class="d-flex flex-column py-6">
       <v-img
         max-height="92"
         max-width="92"
