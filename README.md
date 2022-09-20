@@ -1,4 +1,4 @@
-# Docksmanager
+# Docsmanager
 
 Docksmanager it cloud storage service for files.After registration or authorization, you will be able to upload files, rename, delete and receive a direct download link, you can also create folders.There is a search to filter the contents of the vault, for example by file type.
 
