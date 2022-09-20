@@ -23,6 +23,7 @@ export default {
   },
   mounted() {
     this.downloadFiles(this.$route.params.id);
+    this.downloadCurrentFolder(this.$route.params.id);
   },
 };
 </script>

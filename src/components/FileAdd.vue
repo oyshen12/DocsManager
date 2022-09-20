@@ -117,7 +117,6 @@ export default {
       }
       this.file = file;
       this.modalFile = true;
-      console.log("file ", file);
     },
     async fileupload() {
       const formData = new FormData();

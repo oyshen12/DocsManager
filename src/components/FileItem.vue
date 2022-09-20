@@ -23,7 +23,7 @@
       <div class="d-flex justify-space-between align-center">
         <div>
           <v-card-text class="py-0">{{ fileDate }} г.</v-card-text>
-          <v-card-text class="py-0"> {{ file.size / 1000 }} Кб</v-card-text>
+          <v-card-text class="py-0"> {{ readableSize(file.size) }}</v-card-text>
         </div>
         <v-menu bottom offset-y>
           <template v-slot:activator="{ on, attrs }">

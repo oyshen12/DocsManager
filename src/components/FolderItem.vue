@@ -21,7 +21,7 @@
         <span>{{ folderName }}</span>
       </v-tooltip>
       <v-card-text class="py-0">{{ folderDate }} г.</v-card-text>
-      <v-card-text class="py-0"> {{ folder.size / 1000 }} Кб</v-card-text>
+      <v-card-text class="py-0"> {{ readableSize(folder.size) }}</v-card-text>
     </v-card>
   </v-hover>
 </template>

@@ -51,6 +51,22 @@ export default {
       });
       this.setFiles(data.data);
     },
+
+    async downloadCurrentFolder(folderID) {
+      const { data } = await axios.get(
+        `http://markwebdev.ru/api/v1/folders/${folderID}`,
+        {
+          headers: {
+            Authorization: this.authorizationToken,
+          },
+        }
+      );
+      this.setСurrentFolder(data.data);
+    },
+
+    readableSize(size) {
+      return size < 1000 ? `${size} Б.` : `${Math.round(size / 1000)} Кб.`;
+    },
   },
   mounted() {
     const authorizationToken = localStorage.getItem("authorizationToken");

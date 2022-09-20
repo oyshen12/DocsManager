@@ -48,7 +48,14 @@
     <v-divider class=""></v-divider>
 
     <v-main class="px-16" v-if="authorizationToken">
-      <div class="d-flex justify-space-between my-8">
+      <div class="d-flex justify-space-between align-center my-8">
+        <v-btn
+          v-if="currentFolder.id !== -1"
+          @click="$router.push({ name: 'home' })"
+          icon
+          class="mr-8"
+          ><v-icon color="primary" x-large>keyboard_backspace</v-icon></v-btn
+        >
         <h1 class="text">
           {{
             currentFolder.name === "Корневая папка"
@@ -56,7 +63,7 @@
               : "Папка: " + currentFolder.name
           }}
         </h1>
-        <h1 class="">- {{ this.folderSize }} Кб.</h1>
+        <h1 class="">- {{ readableSize(this.folderSize) }}</h1>
         <v-text-field
           v-model="searchInputLoc"
           label="Поиск..."
@@ -97,14 +104,12 @@
 </template>
 
 <script>
-import ModalForm from "@/components/ModalForm.vue";
 import axios from "axios";
 import CommonMixin from "@/mixins/CommonMixin";
 import { mapMutations } from "vuex";
 
 export default {
   name: "App",
-  components: { ModalForm },
   mixins: [CommonMixin],
   data: () => ({
     modalAuth: false,
@@ -220,14 +225,15 @@ export default {
     searchInputLoc(newVal) {
       this.setSearchInput(newVal);
     },
-    files(newVal) {
-      this.folderSize = newVal.reduce((acc, el) => (acc += el.size), 0) / 1000;
+    files(newFiles) {
+      this.folderSize = newFiles.reduce((acc, el) => (acc += el.size), 0);
       if (this.currentFolder.id === -1) {
-        const foldersSize =
-          this.folders.reduce((acc, el) => (acc += el.size), 0) / 1000;
+        const foldersSize = this.folders.reduce(
+          (acc, el) => (acc += el.size),
+          0
+        );
         this.folderSize += foldersSize;
       }
-      this.folderSize = Math.round(this.folderSize);
     },
   },
 };
