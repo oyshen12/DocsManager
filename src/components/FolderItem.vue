@@ -2,7 +2,6 @@
   <v-hover v-slot="{ hover }">
     <v-card
       @click="goToFolder"
-      width="240"
       :class="{ 'card-hover': hover }"
       class="d-flex flex-column py-6"
     >

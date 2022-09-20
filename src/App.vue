@@ -47,7 +47,7 @@
     </header>
     <v-divider class=""></v-divider>
 
-    <v-main class="px-16" v-if="authorizationToken">
+    <v-main class="px-16 pb-8" v-if="authorizationToken">
       <div class="d-flex justify-space-between align-center my-8">
         <v-btn
           v-if="currentFolder.id !== -1"
