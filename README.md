@@ -16,16 +16,16 @@ Launch the application using the following command:
 npm run serve
 ```
 ### App:
-![Alt Text](2022-09-19-15-37-49.gif)
+![Alt Text](readmeImg/2022-09-19-15-37-49.gif)
 
 ### Main page:
-![Alt-текст](https://i.ibb.co/xsRd7ZH/image.png)
+![Alt-текст](readmeImg/image.png)
 
 ### Filtred by file type:
-![Alt-текст](https://i.ibb.co/pwTccpG/image.png)
+![Alt-текст](readmeImg/image1.png)
 
 ### Folder page:
-![Alt-текст](https://i.ibb.co/s34bc9Z/image.png)
+![Alt-текст](readmeImg/image2.png)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
