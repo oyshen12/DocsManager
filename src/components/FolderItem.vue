@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     goToFolder() {
-      this.setСurrentFolder({ id: this.folder.id, name: this.folder.name });
+      this.setCurrentFolder({ id: this.folder.id, name: this.folder.name });
       this.setFiles([]);
       this.$router.push({ name: "folder", params: { id: this.folder.id } });
     },

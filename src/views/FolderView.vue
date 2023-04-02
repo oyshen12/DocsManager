@@ -2,7 +2,7 @@
   <div class="grid">
     <file-add></file-add>
     <file-item
-      v-for="file in filtredFiles"
+      v-for="file in filtrededFiles"
       :file="file"
       :key="file.id"
       class="mt-4"

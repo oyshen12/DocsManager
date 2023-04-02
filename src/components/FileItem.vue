@@ -57,11 +57,12 @@
         >
           <v-card class="d-flex flex-column">
             <v-card-title>Переименовать файл</v-card-title>
-            <v-text-field
-              v-model="newFileName"
+            <MainInput
+              :value="newFileName"
+              @input="newFileName = $event"
               label="Имя"
               class="mx-8"
-            ></v-text-field>
+            />
             <v-btn @click="fileRename" color="primary" class="ml-auto mr-8 mb-8"
               >Сохранить</v-btn
             >
@@ -70,12 +71,7 @@
         <v-dialog v-model="modalPublicLink">
           <v-card class="d-flex flex-column">
             <v-card-title>Ссылка для скачивания файла:</v-card-title>
-            <v-text-field
-              :value="fileLink"
-              solo
-              readonly
-              class="mx-8"
-            ></v-text-field>
+            <MainInput :value="fileLink" solo readonly class="mx-8" />
           </v-card>
         </v-dialog>
       </div>
@@ -85,7 +81,7 @@
 
 <script>
 import CommonMixin from "@/mixins/CommonMixin";
-import axios from "axios";
+import MainInput from "./MainComponents/MainInput.vue";
 
 export default {
   props: {
@@ -93,6 +89,7 @@ export default {
       require: true,
     },
   },
+  components: { MainInput },
   mixins: [CommonMixin],
   data() {
     return {
@@ -127,46 +124,35 @@ export default {
   },
   methods: {
     async deleteFile() {
-      await axios.delete(`${this.baseUrl}/files/${this.file.id}`, {
-        headers: {
-          Authorization: this.authorizationToken,
-        },
-      });
-      this.downloadFiles(this.currentFolder.id);
+      try {
+        await this.api.delete(`/files/${this.file.id}`, {});
+        this.downloadFiles(this.currentFolder.id);
+      } catch {
+        //
+      }
     },
     async fileRename() {
       if (!this.newFileName) {
         return;
       }
-      await axios.patch(
-        `${this.baseUrl}/files/${this.file.id}`,
-        {},
-        {
-          params: {
-            name: this.newFileName,
-          },
-          headers: {
-            Authorization: this.authorizationToken,
-          },
-        }
-      );
-      this.modalRenameFile = false;
-      this.downloadFiles(this.currentFolder.id);
+      try {
+        await this.api.patch(`/files/${this.file.id}`, params);
+        this.modalRenameFile = false;
+        this.downloadFiles(this.currentFolder.id);
+      } catch {
+        //
+      }
     },
     async getFileLink() {
       if (this.fileLink) {
         return;
       }
-      const resp = await axios.post(
-        `${this.baseUrl}/files/${this.file.id}/publish`,
-        {},
-        {
-          headers: {
-            Authorization: this.authorizationToken,
-          },
-        }
-      );
-      this.fileLink = resp.data.data.link;
+      try {
+        const resp = await this.api.post(`/files/${this.file.id}/publish`);
+        this.fileLink = resp.data.data.link;
+      } catch {
+        //
+      }
     },
     modalRenameOpen() {
       this.modalRenameFile = true;

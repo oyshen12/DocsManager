@@ -2,13 +2,13 @@
   <div class="grid">
     <file-add></file-add>
     <folder-item
-      v-for="folder in filtredFolders"
+      v-for="folder in filtrededFiles"
       :folder="folder"
       :key="folder.id"
       class="mt-4"
     ></folder-item>
     <file-item
-      v-for="file in filtredFiles"
+      v-for="file in filtrededFiles"
       :file="file"
       :key="file.id"
       class="mt-4"
@@ -32,7 +32,6 @@ export default {
   computed: {},
   methods: {},
   mounted() {
-    this.setСurrentFolder({ id: -1, name: "Корневая папка" });
     this.downloadFolders();
     this.downloadFiles();
   },

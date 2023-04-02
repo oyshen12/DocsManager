@@ -66,7 +66,6 @@
 
 <script>
 import CommonMixin from "@/mixins/CommonMixin";
-import axios from "axios";
 
 export default {
   props: {
@@ -129,9 +128,8 @@ export default {
 
       this.fileLoading = true;
       try {
-        await axios.post(`${this.baseUrl}/files`, formData, {
+        await this.api.post(`/files`, formData, {
           headers: {
-            Authorization: this.authorizationToken,
             "Content-Type": "multipart/form-data",
           },
         });

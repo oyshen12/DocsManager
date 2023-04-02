@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    baseUrl: "http://markwebdev.ru/api/v1",
+    baseUrl: process.env.VUE_APP_BASE_URL,
     authorizationToken: "",
     folders: [],
     files: [],
@@ -16,12 +16,12 @@ export default new Vuex.Store({
     searchInput: "",
   },
   getters: {
-    filtredFiles(state) {
+    filtrededFiles(state) {
       return state.files.filter((el) =>
         el.full_name.toLowerCase().includes(state.searchInput.toLowerCase())
       );
     },
-    filtredFolders(state) {
+    filtrededFiles(state) {
       return state.folders.filter((el) =>
         el.name.toLowerCase().includes(state.searchInput.toLowerCase())
       );
@@ -31,7 +31,7 @@ export default new Vuex.Store({
     setFolders(state, payload) {
       state.folders = payload;
     },
-    setСurrentFolder(state, payload) {
+    setCurrentFolder(state, payload) {
       state.currentFolder = payload;
     },
     setFiles(state, payload) {

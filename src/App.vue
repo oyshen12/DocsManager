@@ -27,17 +27,24 @@
             <v-card-text v-if="authError" class="pl-0 red--text"
               >Неверный email или пароль</v-card-text
             >
-            <v-text-field
+            <MainInput
               v-if="registerModal"
-              v-model="userName"
+              :value="userName"
+              @input="userName = $event"
               label="Имя"
-            ></v-text-field>
-            <v-text-field
-              :rules="[rules.email]"
-              v-model="userEmail"
+            />
+            <MainInput
+              :rules="['email']"
+              :value="userEmail"
+              @input="userEmail = $event"
               label="Email"
-            ></v-text-field>
-            <v-text-field v-model="userPassword" label="Пароль"></v-text-field>
+            />
+            <MainInput
+              :value="userPassword"
+              @input="userPassword = $event"
+              type-password
+              label="Пароль"
+            />
             <v-btn @click="auth" color="primary" class="ml-auto">{{
               registerModal ? "Регистрация" : "Войти"
             }}</v-btn>
@@ -57,18 +64,15 @@
           ><v-icon color="primary" x-large>keyboard_backspace</v-icon></v-btn
         >
         <h1 class="text">
-          {{
-            currentFolder.name === "Корневая папка"
-              ? currentFolder.name
-              : "Папка: " + currentFolder.name
-          }}
+          {{ folderName }}
         </h1>
         <h1 class="">- {{ readableSize(this.folderSize) }}</h1>
-        <v-text-field
-          v-model="searchInputLoc"
+        <MainInput
+          :value="searchInput"
+          @input="setSearchInput($event)"
           label="Поиск..."
           class="pt-0 mx-16"
-        ></v-text-field>
+        />
         <div>
           <v-btn icon fab class="mr-4">
             <v-icon x-large color="black">list</v-icon>
@@ -83,11 +87,12 @@
           <v-dialog v-model="modalState" v-if="modalState" max-width="400">
             <v-card class="pa-8 d-flex flex-column">
               <v-card-title class="pl-0">Добавить папку</v-card-title>
-              <v-text-field
-                v-model="folderName"
+              <MainInput
+                :value="folderName"
+                @input="folderName = $event"
                 label="Название"
-                :rules="[rules.required]"
-              ></v-text-field>
+                :rules="['required']"
+              />
               <v-btn @click="addFolder" color="primary" class="ml-auto"
                 >Добавить</v-btn
               >
@@ -104,62 +109,53 @@
 </template>
 
 <script>
-import axios from "axios";
 import CommonMixin from "@/mixins/CommonMixin";
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
+import MainInput from "./components/MainComponents/MainInput.vue";
 
 export default {
   name: "App",
+  components: { MainInput },
   mixins: [CommonMixin],
   data: () => ({
     modalAuth: false,
     modalRegister: false,
     modalState: false,
-    rules: {
-      required: (value) => !!value || "Required.",
-      email: (value) => {
-        const pattern =
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return pattern.test(value) || "Неверный формат email.";
-      },
-    },
-    folderName: "",
+    newFolderName: "",
     userEmail: "",
     userPassword: "",
     userName: "",
     typeAuth: "",
     authError: false,
-    searchInputLoc: "",
     folderSize: 0,
   }),
   computed: {
+    ...mapState(["searchInput"]),
     registerModal() {
       return this.typeAuth === "register";
     },
+    folderName() {
+      return currentFolder.name
+        ? "Папка: " + currentFolder.name
+        : "Корневая папка";
+    },
   },
   methods: {
-    ...mapMutations({
-      setAuthorizationToken: "setAuthorizationToken",
-    }),
+    ...mapMutations(["setAuthorizationToken"]),
     async addFolder() {
-      if (!this.folderName) {
+      if (!this.newFolderName) {
         return;
       }
-      await axios.post(
-        `${this.baseUrl}/folders`,
-        {
-          name: this.folderName,
-        },
-        {
-          headers: {
-            Authorization: this.authorizationToken,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      this.folderName = "";
-      this.modalState = false;
-      this.downloadFolders();
+      try {
+        await this.api.post(`/folders`, {
+          name: this.newFolderName,
+        });
+        this.newFolderName = "";
+        this.modalState = false;
+        this.downloadFolders();
+      } catch {
+        //
+      }
     },
     modalChange(val) {
       this.authModal = val;
@@ -169,7 +165,7 @@ export default {
       this.typeAuth = typeAuth;
     },
     async auth() {
-      const authLink = this.baseUrl + "/auth/" + this.typeAuth;
+      const authLink = "/auth/" + this.typeAuth;
       const params = {
         email: this.userEmail,
         password: this.userPassword,
@@ -179,16 +175,7 @@ export default {
       }
 
       try {
-        const resp = await axios.post(
-          authLink,
-          {},
-          {
-            params,
-            headers: {
-              Authorization: this.authorizationToken,
-            },
-          }
-        );
+        const resp = await this.api.post(authLink, params);
         if (resp.status === 200) {
           this.setAuthorizationToken(resp.data.data.token);
           localStorage.setItem("authorizationToken", this.authorizationToken);
@@ -196,24 +183,26 @@ export default {
           this.authError = false;
         }
       } catch (e) {
-        if (e.response.status === 422) {
+        if (e.response?.status === 422) {
           this.authError = true;
         }
       }
     },
     async logout() {
-      await axios.post(
-        `${this.baseUrl}/auth/logout`,
-        {},
-        {
-          headers: {
-            Authorization: this.authorizationToken,
-          },
-        }
-      );
-      localStorage.removeItem("authorizationToken");
-      this.setAuthorizationToken("");
+      try {
+        await this.api.post(`/auth/logout`);
+        localStorage.removeItem("authorizationToken");
+        this.setAuthorizationToken("");
+      } catch {
+        //
+      }
     },
+  },
+  mounted() {
+    const authorizationToken = localStorage.getItem("authorizationToken");
+    if (authorizationToken) {
+      this.setAuthorizationToken("Bearer " + authorizationToken);
+    }
   },
   watch: {
     modalAuth() {
@@ -221,9 +210,6 @@ export default {
       this.userPassword = "";
       this.userName = "";
       this.authError = false;
-    },
-    searchInputLoc(newVal) {
-      this.setSearchInput(newVal);
     },
     files(newFiles) {
       this.folderSize = newFiles.reduce((acc, el) => (acc += el.size), 0);
