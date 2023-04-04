@@ -2,7 +2,7 @@
   <div class="grid">
     <file-add></file-add>
     <folder-item
-      v-for="folder in filtrededFiles"
+      v-for="folder in filtrededFolders"
       :folder="folder"
       :key="folder.id"
       class="mt-4"
@@ -21,16 +21,15 @@ import FolderItem from "@/components/FolderItem.vue";
 import FileItem from "@/components/FileItem.vue";
 import FileAdd from "@/components/FileAdd.vue";
 import CommonMixin from "@/mixins/CommonMixin";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Home",
   components: { FolderItem, FileItem, FileAdd },
   mixins: [CommonMixin],
-  data() {
-    return {};
+  computed: {
+    ...mapGetters(["filtrededFolders", "filtrededFiles"]),
   },
-  computed: {},
-  methods: {},
   mounted() {
     this.downloadFolders();
     this.downloadFiles();

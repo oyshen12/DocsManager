@@ -1,28 +1,9 @@
-import { mapState, mapMutations, mapGetters } from "vuex";
+import { mapMutations, mapActions } from "vuex";
 
 export default {
-  data() {
-    return {};
-  },
-  computed: {
-    ...mapState([
-      "baseUrl",
-      "authorizationToken",
-      "folders",
-      "files",
-      "currentFolder",
-      "searchInput",
-    ]),
-    ...mapGetters(["filtrededFiles", "filtrededFiles"]),
-  },
   methods: {
-    ...mapMutations([
-      "setFolders",
-      "setAuthorizationToken",
-      "setFiles",
-      "setSearchInput",
-      "setCurrentFolder",
-    ]),
+    ...mapMutations(["setFolders", "setFiles", "setCurrentFolder"]),
+    ...mapActions(["getFolders", "getFiles", "getFolder"]),
 
     getFileExtention(fileName) {
       return fileName.split(".").pop();
@@ -30,7 +11,7 @@ export default {
 
     async downloadFolders() {
       try {
-        const { data } = await this.api.get(`/folders`);
+        const { data } = await this.getFolders();
         this.setFolders(data.data);
       } catch {
         //
@@ -40,9 +21,7 @@ export default {
     async downloadFiles(folderID = -1) {
       const params = { folder_id: folderID };
       try {
-        const { data } = await this.api.get("/files", {
-          params,
-        });
+        const { data } = await this.getFiles(params);
         this.setFiles(data.data);
       } catch {
         //
@@ -51,7 +30,7 @@ export default {
 
     async downloadCurrentFolder(folderID) {
       try {
-        const { data } = await this.api.get(`/folders/${folderID}`);
+        const { data } = await this.getFolder(folderID);
         this.setCurrentFolder(data.data);
       } catch {
         //

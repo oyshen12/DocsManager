@@ -1,7 +1,7 @@
 import axios from "axios";
 import store from "@/store";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL,
 });
 

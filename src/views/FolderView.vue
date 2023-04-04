@@ -18,9 +18,6 @@ import FileAdd from "@/components/FileAdd.vue";
 export default {
   mixins: [CommonMixin],
   components: { FileItem, FileAdd },
-  data() {
-    return {};
-  },
   mounted() {
     this.downloadFiles(this.$route.params.id);
     this.downloadCurrentFolder(this.$route.params.id);

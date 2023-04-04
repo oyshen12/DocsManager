@@ -6,7 +6,7 @@
         <h1 class="ml-4">Документы</h1>
       </div>
       <div>
-        <v-btn v-if="authorizationToken" @click="logout" color="primary"
+        <v-btn v-if="authorizationToken" @click="logoutHandler" color="primary"
           >Выйти</v-btn
         >
         <div v-else>
@@ -66,7 +66,7 @@
         <h1 class="text">
           {{ folderName }}
         </h1>
-        <h1 class="">- {{ readableSize(this.folderSize) }}</h1>
+        <h1 class="">- {{ readableSize(this.currentFolderSize) }}</h1>
         <MainInput
           :value="searchInput"
           @input="setSearchInput($event)"
@@ -110,7 +110,7 @@
 
 <script>
 import CommonMixin from "@/mixins/CommonMixin";
-import { mapMutations, mapState } from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import MainInput from "./components/MainComponents/MainInput.vue";
 
 export default {
@@ -127,32 +127,31 @@ export default {
     userName: "",
     typeAuth: "",
     authError: false,
-    folderSize: 0,
   }),
   computed: {
-    ...mapState(["searchInput"]),
+    ...mapState(["searchInput", "authorizationToken", "currentFolder"]),
+    ...mapGetters(["currentFolderSize"]),
     registerModal() {
       return this.typeAuth === "register";
     },
     folderName() {
-      return currentFolder.name
+      return this.currentFolder.name
         ? "Папка: " + currentFolder.name
         : "Корневая папка";
     },
   },
   methods: {
-    ...mapMutations(["setAuthorizationToken"]),
+    ...mapMutations(["setAuthorizationToken", "setSearchInput"]),
+    ...mapActions(["createFolder", "logout"]),
+
     async addFolder() {
       if (!this.newFolderName) {
         return;
       }
       try {
-        await this.api.post(`/folders`, {
-          name: this.newFolderName,
-        });
+        await this.createFolder(this.newFolderName);
         this.newFolderName = "";
         this.modalState = false;
-        this.downloadFolders();
       } catch {
         //
       }
@@ -175,24 +174,21 @@ export default {
       }
 
       try {
-        const resp = await this.api.post(authLink, params);
-        if (resp.status === 200) {
-          this.setAuthorizationToken(resp.data.data.token);
-          localStorage.setItem("authorizationToken", this.authorizationToken);
-          this.modalAuth = false;
-          this.authError = false;
-        }
+        await authHandler({
+          link: authLink,
+          params,
+        });
+        this.modalAuth = false;
+        this.authError = false;
       } catch (e) {
         if (e.response?.status === 422) {
           this.authError = true;
         }
       }
     },
-    async logout() {
+    async logoutHandler() {
       try {
-        await this.api.post(`/auth/logout`);
-        localStorage.removeItem("authorizationToken");
-        this.setAuthorizationToken("");
+        await this.logout();
       } catch {
         //
       }
@@ -210,16 +206,6 @@ export default {
       this.userPassword = "";
       this.userName = "";
       this.authError = false;
-    },
-    files(newFiles) {
-      this.folderSize = newFiles.reduce((acc, el) => (acc += el.size), 0);
-      if (this.currentFolder.id === -1) {
-        const foldersSize = this.folders.reduce(
-          (acc, el) => (acc += el.size),
-          0
-        );
-        this.folderSize += foldersSize;
-      }
     },
   },
 };

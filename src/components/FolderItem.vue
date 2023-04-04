@@ -35,9 +35,6 @@ export default {
     },
   },
   mixins: [CommonMixin],
-  data() {
-    return {};
-  },
   computed: {
     folderName() {
       return this.folder.name.split(" ").join("");

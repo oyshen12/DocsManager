@@ -66,6 +66,7 @@
 
 <script>
 import CommonMixin from "@/mixins/CommonMixin";
+import { mapActions } from "vuex";
 
 export default {
   props: {
@@ -102,7 +103,8 @@ export default {
     },
   },
   methods: {
-    fileuploadWindow(event) {
+    ...mapActions(["createFile"]),
+    fileuploadWindow() {
       const file = this.$refs.inputFile.files[0];
       const fileExtention = this.getFileExtention(file.name);
       if (fileExtention === "php") {
@@ -128,16 +130,11 @@ export default {
 
       this.fileLoading = true;
       try {
-        await this.api.post(`/files`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        await this.createFile(formData);
         this.file = "";
         this.modalFile = false;
         this.pickerDate = "";
         this.pickerDateOpen = false;
-        this.downloadFiles(this.currentFolder.id);
       } catch (e) {}
       this.fileLoading = false;
     },

@@ -23,7 +23,7 @@
         </div>
         <v-menu bottom offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on" @click="getFileLink()">
+            <v-btn icon v-bind="attrs" v-on="on" @click="getFileLinkHandler">
               <v-icon>more_vert</v-icon>
             </v-btn>
           </template>
@@ -43,7 +43,7 @@
                 >Получить ссылку для скачивания</v-list-item-title
               >
             </v-list-item>
-            <v-list-item @click="deleteFile">
+            <v-list-item @click="deleteFileHandler">
               <v-list-item-title class="red--text"
                 >Удалить Файл</v-list-item-title
               >
@@ -63,7 +63,10 @@
               label="Имя"
               class="mx-8"
             />
-            <v-btn @click="fileRename" color="primary" class="ml-auto mr-8 mb-8"
+            <v-btn
+              @click="fileRenameHandler"
+              color="primary"
+              class="ml-auto mr-8 mb-8"
               >Сохранить</v-btn
             >
           </v-card>
@@ -82,6 +85,7 @@
 <script>
 import CommonMixin from "@/mixins/CommonMixin";
 import MainInput from "./MainComponents/MainInput.vue";
+import { mapActions } from "vuex";
 
 export default {
   props: {
@@ -123,32 +127,34 @@ export default {
     },
   },
   methods: {
-    async deleteFile() {
+    ...mapActions(["fileRename", "getFileLink"]),
+    async deleteFileHandler() {
       try {
-        await this.api.delete(`/files/${this.file.id}`, {});
-        this.downloadFiles(this.currentFolder.id);
+        await this.deleteFile(this.file.id);
       } catch {
         //
       }
     },
-    async fileRename() {
+    async fileRenameHandler() {
       if (!this.newFileName) {
         return;
       }
       try {
-        await this.api.patch(`/files/${this.file.id}`, params);
+        await this.fileRename({
+          id: this.file.id,
+          name: this.newFileName,
+        });
         this.modalRenameFile = false;
-        this.downloadFiles(this.currentFolder.id);
       } catch {
         //
       }
     },
-    async getFileLink() {
+    async getFileLinkHandler() {
       if (this.fileLink) {
         return;
       }
       try {
-        const resp = await this.api.post(`/files/${this.file.id}/publish`);
+        const resp = await this.getFileLink(this.file.id);
         this.fileLink = resp.data.data.link;
       } catch {
         //
